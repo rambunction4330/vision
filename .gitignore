@@ -1,6 +1,7 @@
 # CMake files #
 ###############
 /build/
+**/build/
 
 # Compiled source #
 ###################
