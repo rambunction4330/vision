@@ -10,6 +10,7 @@ int main( ) {
   // want 1920X1080 ?
   capture.set(CV_CAP_PROP_FRAME_WIDTH, 640);
   capture.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
+  capture.set(CV_CAP_PROP_FPS, 10);
   if(!capture.isOpened()) {
     cout << "Failed to connect to the camera." << endl;
   }
