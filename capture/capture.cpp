@@ -4,6 +4,8 @@ using namespace std;
 using namespace cv;
 
 const char* capture_window = "Capture Window";
+const char* binary_window = "Binary Image";
+const char* clean_window = "Cleaned Image";
 
 int main( ) {
   VideoCapture capture(0);
@@ -15,7 +17,9 @@ int main( ) {
     cout << "Failed to connect to the camera." << endl;
   }
   namedWindow(capture_window, CV_WINDOW_AUTOSIZE);
-  Mat frame;
+  namedWindow(binary_window, CV_WINDOW_AUTOSIZE);
+  namedWindow( clean_window, CV_WINDOW_AUTOSIZE );
+  Mat frame, hsv, binary, tmpBinary, clean;
   while(true) {
     capture >> frame;
     if(frame.empty()) {
@@ -23,6 +27,33 @@ int main( ) {
       return -1;
     }
     imshow(capture_window, frame);
+    
+    cvtColor(frame, hsv, CV_BGR2HSV);
+    inRange(hsv, Scalar(31,22,158), Scalar(105,255,255), binary);
+    imshow(binary_window, binary);
+
+    std::vector < std::vector<Point> > contours;
+    std::vector < std::vector<Point> > filteredContours;
+    tmpBinary = binary.clone();
+    findContours(tmpBinary, contours, RETR_LIST, CHAIN_APPROX_NONE);
+    tmpBinary.release();
+    cvtColor( binary, clean, CV_GRAY2RGB );
+    clean.setTo(Scalar(255,255,255));
+
+    for (size_t contourIdx = 0; contourIdx < contours.size(); contourIdx++) {
+      Moments moms = moments(Mat(contours[contourIdx]));
+
+      // filter blobs which are too small
+      double area = moms.m00;
+      if ( area < 500 ) {
+        continue;
+      }
+
+      filteredContours.push_back(contours[contourIdx]);
+    }
+
+    drawContours( clean, filteredContours, -1, Scalar(0,255,0) );
+    imshow(clean_window, clean);
   }
   return(0);
 }
