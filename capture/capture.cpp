@@ -29,7 +29,7 @@ int main( ) {
     imshow(capture_window, frame);
     
     cvtColor(frame, hsv, CV_BGR2HSV);
-    inRange(hsv, Scalar(31,22,158), Scalar(105,255,255), binary);
+    inRange(hsv, Scalar(30,22,158), Scalar(100,255,255), binary);
     imshow(binary_window, binary);
 
     std::vector < std::vector<Point> > contours;
