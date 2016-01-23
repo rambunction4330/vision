@@ -20,7 +20,7 @@ int main( ) {
     cout << "Failed to connect to the camera." << endl;
   }
   Mat frame, framecopy, hsv, binary, tmpBinary, clean;
-  int maxFrames = 300;
+  int maxFrames = 50;
   for(int i=0; i < maxFrames; i++) {
     cout << "Frame " << i << endl;
     capture >> frame;
@@ -51,7 +51,7 @@ int main( ) {
 
       // filter blobs which are too small
       double area = moms.m00;
-      if ( area < 500 ) {
+      if ( area < 400 ) {
         continue;
       }
       center = Point2d(moms.m10 / moms.m00, moms.m01 / moms.m00);
