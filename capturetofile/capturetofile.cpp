@@ -20,6 +20,7 @@ int main( ) {
     cout << "Failed to connect to the camera." << endl;
   }
   Mat frame, framecopy, hsv, binary, tmpBinary, clean;
+//Change maxFrames for maximum amount of frames saved.
   int maxFrames = 50;
   for(int i=0; i < maxFrames; i++) {
     cout << "Frame " << i << endl;
