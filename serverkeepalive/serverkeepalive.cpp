@@ -6,12 +6,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
-#include <semaphore.h>
 
 #define PORTNUMBER  9001 
 
 double relativeBearing = 24.9;
-double distance = 10.32;
+pthread_mutex_t dataLock;
 
 // forward declaration of functions
 void *handleClient(void *arg);
@@ -24,6 +23,7 @@ int main(void)
   int max;
   int number;
   struct sockaddr_in name;
+  pthread_mutex_init(&dataLock, NULL);
 
   // create the socket
   if ( (s = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -77,7 +77,10 @@ int main(void)
     // a single client can hold a connection open indefinitely making multiple
     // data requests prior to closing the connection
     pthread_t threadId;
-    int thread = pthread_create( &threadId, NULL, handleClient, (void*) &ns);
+    int thread = pthread_create(&threadId, NULL, handleClient, (void*) &ns);
+    // it is important to detach the thread since we don't care to join on the thread
+    // and not calling pthread_detach will create a memory leak
+    pthread_detach(threadId);
 
   } 
   
@@ -101,10 +104,14 @@ void *handleClient(void *arg) {
       break;
     } else if ( strcmp(command, "DATA") == 0 ) {
       //printf("Received DATA command\n");
+
+      // obtain the lock and copy the data
+      pthread_mutex_lock(&dataLock);
+      double copyRelativeBearing = relativeBearing;
+      pthread_mutex_unlock(&dataLock);
+      
       // the protocol will send an empty line when the data transfer is complete
-      int sendbufferLen = sprintf(sendbuffer, 
-        "relativeBearing=%.1f\ndistance=%.2f\n\n",
-	relativeBearing, distance);
+      int sendbufferLen = sprintf(sendbuffer, "rb=%.1f\n\n", copyRelativeBearing);
 
       // write response to client
       write(ns, sendbuffer, sendbufferLen);
@@ -120,18 +127,15 @@ void *handleClient(void *arg) {
 }
 
 void receiveNextCommand(char *command, int ns) {
-  char buffer[1024];
-  int receiveLength = read(ns, buffer, 1024);
+  int receiveLength = read(ns, command, 1024);
   int commandLength = 0;
   while(commandLength < receiveLength) {
-    char value = buffer[commandLength];
+    char value = command[commandLength];
     if ( value == 0x0d || value == 0x0a ) {
       break;
     } 
     commandLength++;
   }
-
-  memcpy(command, buffer, commandLength);
 
   // add the terminating 0 to mark the end of the string value in the char *
   command[commandLength] = 0;
