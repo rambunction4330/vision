@@ -10,6 +10,6 @@ using namespace cv;
 
 int main()
 {
-	cout << "deez nuts" << endl;
+	cout << "" << endl;
 	return 0;
 }
