@@ -7,8 +7,13 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <iostream>
+#include "opencv2/opencv.hpp"
 
 #define PORTNUMBER  9001 
+
+using namespace std;
+using namespace cv;
 
 double relativeBearing = 24.9;
 pthread_mutex_t dataLock;
@@ -16,6 +21,7 @@ pthread_mutex_t dataLock;
 // forward declaration of functions
 void *handleClient(void *arg);
 void receiveNextCommand(char*, int);
+void *capture(void *arg);
 
 int main(void)
 {
@@ -63,6 +69,13 @@ int main(void)
     perror("listen");
     exit(1);
   }
+  int i = 3;
+ pthread_t captureThreadId;
+    int captureThread = pthread_create(&captureThreadId, NULL, capture, (void*)&i);
+    // it is important to detach the thread since we don't care to join o$
+    // and not calling pthread_detach will create a memory leak
+    pthread_detach(captureThreadId);
+
 
   while(true) {
 
@@ -82,11 +95,32 @@ int main(void)
     // it is important to detach the thread since we don't care to join on the thread
     // and not calling pthread_detach will create a memory leak
     pthread_detach(threadId);
-
   } 
   
   close(s);
   exit(0);
+}
+
+void *capture(void *arg)
+{  
+ VideoCapture capture(1);
+  // want 1920X1080 ?
+  capture.set(CV_CAP_PROP_FRAME_WIDTH, 640);
+  capture.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
+  capture.set(CV_CAP_PROP_FPS, 10);
+  if(!capture.isOpened()) {
+    cout << "Failed to connect to the camera." << endl;
+  }
+  Mat frame, framecopy, hsv, binary, tmpBinary, clean;
+//Change maxFrames for maximum amount of frames saved.
+  int maxFrames = 300;
+  for(int i=0; i < maxFrames; i++) {
+    cout << "Frame " << i << endl;
+    capture >> frame;
+    if(frame.empty()) {
+      cout << "failed to capture an image" << endl;
+     }  
+   }
 }
 
 void *handleClient(void *arg) {
