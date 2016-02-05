@@ -143,9 +143,10 @@ void *capture(void *arg)
     cvtColor( binary, clean, CV_GRAY2RGB );
     clean.setTo(Scalar(255,255,255));
     //garea = greatest area
-   double garea = -1
-
-    double x = -1;
+    
+    double greatestArea = -1;
+	double xOfGreatestArea = -1;
+    
     for (size_t contourIdx = 0; contourIdx < contours.size(); contourIdx++) {
       Point2d center;
       Moments moms = moments(Mat(contours[contourIdx]));
@@ -155,13 +156,14 @@ void *capture(void *arg)
       if ( area < 400 ) {
         continue;
       }
-      if( area > garea){
-      garea = area;
+      if(area > greatestArea){
+		greatestArea = area;
+		xOfGreatestArea = moms.m10 / moms.m00;
       }
       center  = Point2d(moms.m10 / moms.m00, moms.m01 / moms.m00);
      // circle(clean, center, 2, Scalar(0), 2, 8, 0);
       filteredContours.push_back(contours[contourIdx]);
-     std:: cout << x << endl;
+     std:: cout << xOfGreatestArea << endl;
     }
 
     drawContours( clean, filteredContours, -1, Scalar(0,255,0) );
