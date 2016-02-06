@@ -11,11 +11,12 @@
 #include "opencv2/opencv.hpp"
 
 #define PORTNUMBER  9001 
+#define DONOTKNOW = 1000000
 
 using namespace std;
 using namespace cv;
 
-double relativeBearing = 24.9;
+double relativeBearing = DONOTKNOW;
 pthread_mutex_t dataLock;
 
 // forward declaration of functions
@@ -72,6 +73,9 @@ int main(void)
   int i = 3;
  pthread_t captureThreadId;
     int captureThread = pthread_create(&captureThreadId, NULL, capture, (void*)&i);
+
+    //1. Do the Math from pixel to angle 
+    //2. Bearing update double(angle) to a string update the thread then destroy thread 
     // it is important to detach the thread since we don't care to join o$
     // and not calling pthread_detach will create a memory leak
     pthread_detach(captureThreadId);
@@ -103,6 +107,7 @@ int main(void)
 
 void *capture(void *arg)
 {  
+  
   const char* source_filename = "source.jpg";
   const char* binary_filename = "binary.jpg";
   const char* clean_filename = "clean.jpg";
@@ -120,35 +125,38 @@ void *capture(void *arg)
   }
   Mat frame, framecopy, hsv, binary, tmpBinary, clean;
 //Change maxFrames for maximum amount of frames saved.
+  
+  
   for(int i=0; i==i; i++) {
+	double Diff, tmp, angle;
+	double greatestArea = -1;
+	double xOfGreatestArea = -1;
+		
     cout << "Frame " << i << endl;
     capture >> frame;
     if(frame.empty()) {
       cout << "failed to capture an image" << endl;
     }
     framecopy = frame.clone();
-    sprintf(this_source_filename, "%d%s", i, source_filename);
+    //sprintf(this_source_filename, "%d%s", i, source_filename);
    // imwrite(this_source_filename, framecopy);
     
     cvtColor(framecopy, hsv, CV_BGR2HSV);
     inRange(hsv, Scalar(30,22,158), Scalar(100,255,255), binary);
-    sprintf(this_binary_filename, "%d%s", i, binary_filename);
+    //sprintf(this_binary_filename, "%d%s", i, binary_filename);
    //imwrite(this_binary_filename, binary);
 
     std::vector < std::vector<Point> > contours;
-    std::vector < std::vector<Point> > filteredContours;
+    //std::vector < std::vector<Point> > filteredContours;
     tmpBinary = binary.clone();
     findContours(tmpBinary, contours, RETR_LIST, CHAIN_APPROX_NONE);
     tmpBinary.release();
-    cvtColor( binary, clean, CV_GRAY2RGB );
-    clean.setTo(Scalar(255,255,255));
+    //cvtColor( binary, clean, CV_GRAY2RGB );
+    //clean.setTo(Scalar(255,255,255));
     //garea = greatest area
     
-    double greatestArea = -1;
-	double xOfGreatestArea = -1;
-    
     for (size_t contourIdx = 0; contourIdx < contours.size(); contourIdx++) {
-      Point2d center;
+      //Point2d center;
       Moments moms = moments(Mat(contours[contourIdx]));
 
       // filter blobs which are too small
@@ -160,17 +168,30 @@ void *capture(void *arg)
 		greatestArea = area;
 		xOfGreatestArea = moms.m10 / moms.m00;
       }
-      center  = Point2d(moms.m10 / moms.m00, moms.m01 / moms.m00);
+      //center  = Point2d(moms.m10 / moms.m00, moms.m01 / moms.m00);
      // circle(clean, center, 2, Scalar(0), 2, 8, 0);
-      filteredContours.push_back(contours[contourIdx]);
-     std:: cout << xOfGreatestArea << endl;
+      //filteredContours.push_back(contours[contourIdx]);
+       cout << xOfGreatestArea << endl;
     }
+    
+    double angle = DONOTKNOW;
+    if ( xOfGreatestArea != -1 ) {
+      double diff = xOfGreatestArea - 320;
+	  double tmp = sqrt((640*640)+(480*480));
+	  angle = Diff*(78/tmp);
+    }
+    
+    // obtain the lock and copy the data
+      pthread_mutex_lock(&dataLock);
+      relativeBearing = angle;
+      pthread_mutex_unlock(&dataLock);
 
-    drawContours( clean, filteredContours, -1, Scalar(0,255,0) );
-    sprintf(this_clean_filename, "%d%s", i, clean_filename);
+    //drawContours( clean, filteredContours, -1, Scalar(0,255,0) );
+    //sprintf(this_clean_filename, "%d%s", i, clean_filename);
    // imwrite(this_clean_filename, clean);
   }
 }
+
 
 
 void *handleClient(void *arg) {
@@ -196,7 +217,12 @@ void *handleClient(void *arg) {
       pthread_mutex_unlock(&dataLock);
       
       // the protocol will send an empty line when the data transfer is complete
-      int sendbufferLen = sprintf(sendbuffer, "rb=%.1f\n\n", copyRelativeBearing);
+      int sendbufferLen = -1;
+      if ( copyRelativeBearing == DONOTKNOW ) {
+		  sendbufferLen = sprintf(sendbuffer, "\n");
+	  } else {
+		  sendbufferLen = sprintf(sendbuffer, "rb=%.1f\n\n", copyRelativeBearing);
+	  }
 
       // write response to client
       write(ns, sendbuffer, sendbufferLen);
