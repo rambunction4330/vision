@@ -11,7 +11,7 @@ int main( ) {
   char this_binary_filename[255];
   char this_clean_filename[255];
 
-  VideoCapture capture(0);
+  VideoCapture capture(1);
   // want 1920X1080 ?
   capture.set(CV_CAP_PROP_FRAME_WIDTH, 640);
   capture.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
@@ -21,7 +21,7 @@ int main( ) {
   }
   Mat frame, framecopy, hsv, binary, tmpBinary, clean;
 //Change maxFrames for maximum amount of frames saved.
-  int maxFrames = 50;
+  int maxFrames = 600;
   for(int i=0; i < maxFrames; i++) {
     cout << "Frame " << i << endl;
     capture >> frame;

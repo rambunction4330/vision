@@ -143,7 +143,7 @@ void *capture(void *arg) {
     for (size_t contourIdx = 0; contourIdx < contours.size(); contourIdx++) {
 
       const Moments moms = moments(Mat(contours[contourIdx]));
-      double Hu[7];
+ 
       // filter blobs which are too small
       double area = moms.m00;
       if ( area < minimumArea ) {
@@ -152,7 +152,7 @@ void *capture(void *arg) {
       double shapematch = matchShapes(shape, contours[contourIdx], CV_CONTOURS_MATCH_I2, 0);
       //A perfect match would be 0.
       //Smaller is a better match.
-      if(shapematch > 1){
+      if(shapematch > 3){
 		  continue;
 	  }
 	  cout << "match value = " << shapematch << endl;

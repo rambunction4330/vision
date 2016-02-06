@@ -85,16 +85,19 @@ void clean_demo( int, void* )
   //double tempmatch = matchShapes(shape, shape, CV_CONTOURS_MATCH_I2, 0);
   //cout << "perfect match value is " << tempmatch << endl;
   
+  
   double tempmatch = matchShapes(shape, shape2, CV_CONTOURS_MATCH_I2, 0);
   cout << "perfect match value is " << tempmatch << endl;
 
+  double bestShapeMatch = 1000000;
+  Point2d bestCenter;
   for (size_t contourIdx = 0; contourIdx < contours.size(); contourIdx++) {
     Point2d center;
     const Moments moms = moments(Mat(contours[contourIdx]));
 	
     // filter blobs which are too small
     double area = moms.m00;
-    if ( area < 500 ) {
+    if ( area < 300 ) {
       continue;
     }
     Rect rect = boundingRect(contours[contourIdx]);
@@ -104,15 +107,23 @@ void clean_demo( int, void* )
 	//printf("%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\n", Hu[0], Hu[1], Hu[2], Hu[3], Hu[4], Hu[5], Hu[6]);
 	double shapematch = matchShapes(contours[contourIdx], shape, CV_CONTOURS_MATCH_I2, 0);
 	cout << "shape match = " << shapematch << endl;
+		
     printf("Area is %.2f\n", area);
     printf("Rect left=%d, right=%d, top=%d, bottom=%d (origin at top/left)\n", 
       rect.x, rect.x + rect.width,
       rect.y, rect.y + rect.height );
     center = Point2d(moms.m10 / moms.m00, moms.m01 / moms.m00);
+    if ( shapematch < bestShapeMatch ) {
+		bestShapeMatch = shapematch;
+		bestCenter = center;
+	}
     printf("Located at (%.2f, %.2f)\n", center.x, center.y);
     circle( cleanedImage, center, 2, Scalar(0), 2, 8, 0);
     filteredContours.push_back(contours[contourIdx]);
     centers.push_back(center);
+  }
+  if ( bestShapeMatch < 100000 ) {
+	  circle(cleanedImage, bestCenter, 3, Scalar(0,0,255), 2, 8, 0);
   }
 
   drawContours( cleanedImage, filteredContours, -1, Scalar(0,255,0) );
