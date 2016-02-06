@@ -11,7 +11,7 @@
 #include "opencv2/opencv.hpp"
 
 #define PORTNUMBER  9001 
-#define DONOTKNOW = 1000000
+double DONOTKNOW = 1000000;
 
 using namespace std;
 using namespace cv;
@@ -107,7 +107,7 @@ int main(void)
 
 void *capture(void *arg)
 {  
-  
+  double Diff, tmp, angle;
   const char* source_filename = "source.jpg";
   const char* binary_filename = "binary.jpg";
   const char* clean_filename = "clean.jpg";
@@ -128,7 +128,6 @@ void *capture(void *arg)
   
   
   for(int i=0; i==i; i++) {
-	double Diff, tmp, angle;
 	double greatestArea = -1;
 	double xOfGreatestArea = -1;
 		
@@ -176,8 +175,8 @@ void *capture(void *arg)
     
     double angle = DONOTKNOW;
     if ( xOfGreatestArea != -1 ) {
-      double diff = xOfGreatestArea - 320;
-	  double tmp = sqrt((640*640)+(480*480));
+       Diff = xOfGreatestArea - 320;
+	  tmp = sqrt((640*640)+(480*480));
 	  angle = Diff*(78/tmp);
     }
     
