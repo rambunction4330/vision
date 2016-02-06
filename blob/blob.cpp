@@ -58,11 +58,35 @@ void clean_demo( int, void* )
   std::vector < std::vector<Point> > contours;
   std::vector < std::vector<Point> > filteredContours;
   std::vector<Point2d> centers;
+  std::vector<Point> shape;
+  shape.push_back(Point2d(0,0));
+  shape.push_back(Point2d(0,12));
+  shape.push_back(Point2d(2,12));
+  shape.push_back(Point2d(2,2));
+  shape.push_back(Point2d(18,2));
+  shape.push_back(Point2d(18,12));
+  shape.push_back(Point2d(20,12));
+  shape.push_back(Point2d(20,0));
+  shape.push_back(Point2d(0,0));
+  
+  std::vector<Point> shape2;
+  shape2.push_back(Point2d(0,0));
+  shape2.push_back(Point2d(0,12));
+  shape2.push_back(Point2d(20,12));
+  shape2.push_back(Point2d(20,0));
+  shape2.push_back(Point2d(0,0));
+  
   Mat tmpBinaryImage = color_filtered.clone();
   findContours(tmpBinaryImage, contours, RETR_LIST, CHAIN_APPROX_NONE);
   Mat cleanedImage;
   cvtColor( color_filtered, cleanedImage, CV_GRAY2RGB );
   cleanedImage.setTo(Scalar(255,255,255));
+  
+  //double tempmatch = matchShapes(shape, shape, CV_CONTOURS_MATCH_I2, 0);
+  //cout << "perfect match value is " << tempmatch << endl;
+  
+  double tempmatch = matchShapes(shape, shape2, CV_CONTOURS_MATCH_I2, 0);
+  cout << "perfect match value is " << tempmatch << endl;
 
   for (size_t contourIdx = 0; contourIdx < contours.size(); contourIdx++) {
     Point2d center;
@@ -75,10 +99,11 @@ void clean_demo( int, void* )
     }
     Rect rect = boundingRect(contours[contourIdx]);
 	
-	double Hu[7];
-	HuMoments(moms, Hu);
-	printf("%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\n", Hu[0], Hu[1], Hu[2], Hu[3], Hu[4], Hu[5], Hu[6]);
-	
+	//double Hu[7];
+	//HuMoments(moms, Hu);
+	//printf("%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\n", Hu[0], Hu[1], Hu[2], Hu[3], Hu[4], Hu[5], Hu[6]);
+	double shapematch = matchShapes(contours[contourIdx], shape, CV_CONTOURS_MATCH_I2, 0);
+	cout << "shape match = " << shapematch << endl;
     printf("Area is %.2f\n", area);
     printf("Rect left=%d, right=%d, top=%d, bottom=%d (origin at top/left)\n", 
       rect.x, rect.x + rect.width,

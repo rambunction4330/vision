@@ -110,7 +110,17 @@ void *capture(void *arg) {
     cout << "Failed to connect to the camera." << endl;
   }
   Mat frame, hsv, binary, tmpBinary;
-  
+  //Ideal shape of high goal reflective tape.
+  std::vector<Point> shape;
+  shape.push_back(Point2d(0,0));
+  shape.push_back(Point2d(0,12));
+  shape.push_back(Point2d(2,12));
+  shape.push_back(Point2d(2,2));
+  shape.push_back(Point2d(18,2));
+  shape.push_back(Point2d(18,12));
+  shape.push_back(Point2d(20,12));
+  shape.push_back(Point2d(20,0));
+  shape.push_back(Point2d(0,0));
   while(true) {
 		
     capture >> frame;
@@ -139,9 +149,13 @@ void *capture(void *arg) {
       if ( area < minimumArea ) {
         continue;
       }
-      HuMoments(moms, Hu);
-      printf("%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\n", Hu[0], Hu[1], Hu[2], Hu[3], Hu[4], Hu[5], Hu[6]);
-
+      double shapematch = matchShapes(shape, contours[contourIdx], CV_CONTOURS_MATCH_I2, 0);
+      //A perfect match would be 0.
+      //Smaller is a better match.
+      if(shapematch > 1){
+		  continue;
+	  }
+	  cout << "match value = " << shapematch << endl;
       if(area > biggestArea){
         biggestArea = area;
         xOfLargestArea = moms.m10 / moms.m00;
