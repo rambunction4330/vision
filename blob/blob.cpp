@@ -66,15 +66,19 @@ void clean_demo( int, void* )
 
   for (size_t contourIdx = 0; contourIdx < contours.size(); contourIdx++) {
     Point2d center;
-    Moments moms = moments(Mat(contours[contourIdx]));
-
+    const Moments moms = moments(Mat(contours[contourIdx]));
+	
     // filter blobs which are too small
     double area = moms.m00;
     if ( area < 500 ) {
       continue;
     }
     Rect rect = boundingRect(contours[contourIdx]);
-
+	
+	double Hu[7];
+	HuMoments(moms, Hu);
+	printf("%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\n", Hu[0], Hu[1], Hu[2], Hu[3], Hu[4], Hu[5], Hu[6]);
+	
     printf("Area is %.2f\n", area);
     printf("Rect left=%d, right=%d, top=%d, bottom=%d (origin at top/left)\n", 
       rect.x, rect.x + rect.width,
