@@ -69,13 +69,13 @@ void clean_demo( int, void* )
   shape.push_back(Point2d(20,0));
   shape.push_back(Point2d(0,0));
   
-  std::vector<Point> shape2;
+  /*std::vector<Point> shape2;
   shape2.push_back(Point2d(0,0));
   shape2.push_back(Point2d(0,12));
   shape2.push_back(Point2d(20,12));
   shape2.push_back(Point2d(20,0));
   shape2.push_back(Point2d(0,0));
-  
+  */
   Mat tmpBinaryImage = color_filtered.clone();
   findContours(tmpBinaryImage, contours, RETR_LIST, CHAIN_APPROX_NONE);
   Mat cleanedImage;
