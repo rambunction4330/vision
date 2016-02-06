@@ -11,7 +11,7 @@
 #include "opencv2/opencv.hpp"
 
 #define PORTNUMBER  9001 
-double DONOTKNOW = 1000000;
+#define DONOTKNOW 1000000
 
 using namespace std;
 using namespace cv;
@@ -173,7 +173,7 @@ void *capture(void *arg)
        cout << xOfGreatestArea << endl;
     }
     
-    double angle = DONOTKNOW;
+    angle = DONOTKNOW;
     if ( xOfGreatestArea != -1 ) {
        Diff = xOfGreatestArea - 320;
 	  tmp = sqrt((640*640)+(480*480));
