@@ -21,7 +21,7 @@ int main( ) {
   }
   Mat frame, framecopy, hsv, binary, tmpBinary, clean;
 //Change maxFrames for maximum amount of frames saved.
-  int maxFrames = 50;
+  int maxFrames = 600;
   for(int i=0; i < maxFrames; i++) {
     cout << "Frame " << i << endl;
     capture >> frame;
