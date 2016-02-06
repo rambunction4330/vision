@@ -11,7 +11,7 @@ int main( ) {
   char this_binary_filename[255];
   char this_clean_filename[255];
 
-  VideoCapture capture(1);
+  VideoCapture capture(0);
   // want 1920X1080 ?
   capture.set(CV_CAP_PROP_FRAME_WIDTH, 640);
   capture.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
