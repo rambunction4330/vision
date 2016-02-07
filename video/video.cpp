@@ -67,15 +67,18 @@ int main( int, char** argv )
       Point2d center;
       const Moments moms = moments(Mat(contours[contourIdx]));
       double area = moms.m00;
-      if ( area < 300 ) {
+      if ( area < 400 ) {
         continue;
       }
       double shapematch = matchShapes(contours[contourIdx], shape, CV_CONTOURS_MATCH_I2, 0);
-      center = Point2d(moms.m10/moms.m00, moms.m01/moms.m00);
+      if ( shapematch > 5 ) {
+        continue;
+      }
       if ( shapematch < bestShapeMatch ) {
         bestShapeMatch = shapematch;
         bestCenter = center;
       }
+      center = Point2d(moms.m10/moms.m00, moms.m01/moms.m00);
       circle(clean, center, 2, Scalar(0), 2, 8, 0);
       filteredContours.push_back(contours[contourIdx]);
       centers.push_back(center);
