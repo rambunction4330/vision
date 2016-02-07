@@ -81,7 +81,7 @@ int main( int, char** argv )
       centers.push_back(center);
     }
     if ( bestShapeMatch < 1000000 ) {
-      circle(clean, bestCenter, 3, Scalar(0,0,255), 2, 8, 0);
+      circle(clean, bestCenter, 3, Scalar(0,0,255), 4, 8, 0);
     }
     drawContours(clean, filteredContours, -1, Scalar(0,255,0) );
 
