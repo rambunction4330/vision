@@ -3,7 +3,6 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <limits>
  
 using namespace cv;
@@ -26,9 +25,8 @@ int main( int, char** argv )
   char source_name[250];
   char binary_name[250];
   char clean_name[250];
-  startWindowThread();
   namedWindow ( source_window, CV_WINDOW_AUTOSIZE );
-  namedWindow ( binary_window, CV_WINDOW_AUTOSIZE );
+  //namedWindow ( binary_window, CV_WINDOW_AUTOSIZE );
   namedWindow ( clean_window, CV_WINDOW_AUTOSIZE );
   std::vector<Point> shape;
   shape.push_back(Point2d(0,0));
@@ -67,32 +65,38 @@ int main( int, char** argv )
       Point2d center;
       const Moments moms = moments(Mat(contours[contourIdx]));
       double area = moms.m00;
+
       if ( area < 400 ) {
         continue;
       }
+
       double shapematch = matchShapes(contours[contourIdx], shape, CV_CONTOURS_MATCH_I2, 0);
+
       if ( shapematch > 5 ) {
         continue;
       }
+
+      center = Point2d(moms.m10/moms.m00, moms.m01/moms.m00);
+
       if ( shapematch < bestShapeMatch ) {
         bestShapeMatch = shapematch;
         bestCenter = center;
       }
-      center = Point2d(moms.m10/moms.m00, moms.m01/moms.m00);
       circle(clean, center, 2, Scalar(0), 2, 8, 0);
       filteredContours.push_back(contours[contourIdx]);
       centers.push_back(center);
     }
     if ( bestShapeMatch < 1000000 ) {
-      circle(clean, bestCenter, 3, Scalar(0,0,255), 4, 8, 0);
+      circle(clean, bestCenter, 2, Scalar(0,0,255), 2, 8, 0);
+      circle(clean, bestCenter, 7, Scalar(0,0,255), 2, 8, 0);
     }
     drawContours(clean, filteredContours, -1, Scalar(0,255,0) );
 
     imshow(source_window, source);
-    imshow(binary_window, binary);
+    //imshow(binary_window, binary);
     imshow(clean_window, clean);
-
-    usleep(100*1000);
+ 
+    waitKey(100);
   }
   
   return(0);
