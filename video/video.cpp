@@ -105,7 +105,7 @@ int main( int, char** argv )
       }
     }
     // we have 8 or 9 good heading values
-    if ( good_count >= 8 && bestShapeMatch < 1000000 ) {
+    if ( good_count >= 6 && bestShapeMatch < 1000000 ) {
       double averageX = sum / good_count;
       if ( abs(bestCenter.x - averageX) < tolerance ) {
         recentTargets.push_back(bestCenter);
@@ -114,8 +114,11 @@ int main( int, char** argv )
         // discard as a spurious measurement
         recentTargets.push_back(Point2d(-1, -1));
       }
-      if ( good_count > 7 ) {
-        line( clean, Point2d(averageX, 100), Point2d(averageX, 200), Scalar(0,0,255), 2, 8, 0);
+      if ( good_count > 5 ) {
+        line( clean, Point2d(averageX-10, 100), Point2d(averageX+10, 100), Scalar(128,128,128), 1, 8, 0);
+        line( clean, Point2d(averageX-10, 200), Point2d(averageX+10, 200), Scalar(128,128,128), 1, 8, 0);
+        // green line
+        line( clean, Point2d(averageX, 200), Point2d(averageX, 100+10*(10 - good_count)), Scalar(4,106,38), 2, 8, 0);
       }
     } else if ( bestShapeMatch < 1000000 ) {
       recentTargets.push_back(bestCenter);
@@ -123,7 +126,6 @@ int main( int, char** argv )
     } else {
       recentTargets.push_back(Point2d(-1, -1));
     }
-    cout << "good count is " << good_count << endl;
     drawContours(clean, filteredContours, -1, Scalar(0,255,0) );
 
     imshow(source_window, source);
