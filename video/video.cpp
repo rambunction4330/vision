@@ -40,7 +40,8 @@ int main( int, char** argv )
   shape.push_back(Point2d(0,0));
 
   Mat source, hsv, binary, clean;
-  for ( int i = 0; i < 600; i++ ) {
+  std::vector<Point> recentTargets;
+  for ( int i = 30; i < 600; i++ ) {
     printf("Frame %d\n", i);
     sprintf(source_name, "%s/%dsource.jpg", image_dir, i);
 
@@ -86,10 +87,43 @@ int main( int, char** argv )
       filteredContours.push_back(contours[contourIdx]);
       centers.push_back(center);
     }
+    if ( recentTargets.size() >= 10 ) {
+      recentTargets.erase( recentTargets.begin() );
+    } 
     if ( bestShapeMatch < 1000000 ) {
       circle(clean, bestCenter, 2, Scalar(0,0,255), 2, 8, 0);
       circle(clean, bestCenter, 7, Scalar(0,0,255), 2, 8, 0);
     }
+    double tolerance = 50;
+    double sum = 0;
+    double good_count = 0;
+    for ( size_t rtIdx = 0; rtIdx < recentTargets.size(); rtIdx++ ) {
+      double x = recentTargets[rtIdx].x;
+      if ( x >= 0 ) {
+        sum += x;
+        good_count++;
+      }
+    }
+    // we have 8 or 9 good heading values
+    if ( good_count >= 8 && bestShapeMatch < 1000000 ) {
+      double averageX = sum / good_count;
+      if ( abs(bestCenter.x - averageX) < tolerance ) {
+        recentTargets.push_back(bestCenter);
+        good_count++;
+      } else {
+        // discard as a spurious measurement
+        recentTargets.push_back(Point2d(-1, -1));
+      }
+      if ( good_count > 7 ) {
+        line( clean, Point2d(averageX, 100), Point2d(averageX, 200), Scalar(0,0,255), 2, 8, 0);
+      }
+    } else if ( bestShapeMatch < 1000000 ) {
+      recentTargets.push_back(bestCenter);
+      good_count++;
+    } else {
+      recentTargets.push_back(Point2d(-1, -1));
+    }
+    cout << "good count is " << good_count << endl;
     drawContours(clean, filteredContours, -1, Scalar(0,255,0) );
 
     imshow(source_window, source);
