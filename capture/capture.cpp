@@ -8,7 +8,7 @@ const char* binary_window = "Binary Image";
 const char* clean_window = "Cleaned Image";
 
 int main( ) {
-  VideoCapture capture(0);
+  VideoCapture capture(1);
   // want 1920X1080 ?
   capture.set(CV_CAP_PROP_FRAME_WIDTH, 640);
   capture.set(CV_CAP_PROP_FRAME_HEIGHT, 480);

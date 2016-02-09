@@ -155,7 +155,7 @@ void *capture(void *arg) {
       if(shapematch > 5){
 		  continue;
 	  }
-	  cout << "match value = " << shapematch << endl;
+	  //cout << "match value = " << shapematch << endl;
       if(shapematch < bestShapeMatch){
         bestShapeMatch = shapematch;
         xOfBestShapeMatch = moms.m10 / moms.m00;
@@ -166,8 +166,8 @@ void *capture(void *arg) {
     double angle = DONOTKNOW;
     if ( xOfBestShapeMatch != -1) {
       angle = (xOfBestShapeMatch - 320)*60/640;
-      cout << "x = "  << xOfBestShapeMatch << endl;
-      cout << "angle = " << angle << endl; 
+      //cout << "x = "  << xOfBestShapeMatch << endl;
+      //cout << "angle = " << angle << endl; 
     }
   
     // obtain the lock and copy the data
