@@ -102,7 +102,7 @@ int main(void)
 
 void *capture(void *arg) {  
 
-  VideoCapture capture(0);
+  VideoCapture capture(1);
   capture.set(CV_CAP_PROP_FRAME_WIDTH, 640);
   capture.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
   capture.set(CV_CAP_PROP_FPS, 10);
@@ -136,9 +136,9 @@ void *capture(void *arg) {
     findContours(tmpBinary, contours, RETR_LIST, CHAIN_APPROX_NONE);
     tmpBinary.release();
     
-    double biggestArea = -1;
-    double xOfLargestArea = -1;
-    double minimumArea = 300;    
+    double bestShapeMatch = DONOTKNOW;
+    double xOfBestShapeMatch = -1;
+    double minimumArea = 400;    
 
     for (size_t contourIdx = 0; contourIdx < contours.size(); contourIdx++) {
 
@@ -152,21 +152,21 @@ void *capture(void *arg) {
       double shapematch = matchShapes(shape, contours[contourIdx], CV_CONTOURS_MATCH_I2, 0);
       //A perfect match would be 0.
       //Smaller is a better match.
-      if(shapematch > 3){
+      if(shapematch > 5){
 		  continue;
 	  }
 	  cout << "match value = " << shapematch << endl;
-      if(area > biggestArea){
-        biggestArea = area;
-        xOfLargestArea = moms.m10 / moms.m00;
+      if(shapematch < bestShapeMatch){
+        bestShapeMatch = shapematch;
+        xOfBestShapeMatch = moms.m10 / moms.m00;
       }
     
     }
     
     double angle = DONOTKNOW;
-    if ( xOfLargestArea > minimumArea ) {
-      angle = (xOfLargestArea - 320)*60/640;
-      cout << "x = "  << xOfLargestArea << endl;
+    if ( xOfBestShapeMatch != -1) {
+      angle = (xOfBestShapeMatch - 320)*60/640;
+      cout << "x = "  << xOfBestShapeMatch << endl;
       cout << "angle = " << angle << endl; 
     }
   

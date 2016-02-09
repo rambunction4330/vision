@@ -36,7 +36,7 @@ int main( ) {
     cvtColor(framecopy, hsv, CV_BGR2HSV);
     inRange(hsv, Scalar(30,22,158), Scalar(100,255,255), binary);
     sprintf(this_binary_filename, "%d%s", i, binary_filename);
-    imwrite(this_binary_filename, binary);
+    //imwrite(this_binary_filename, binary);
 
     std::vector < std::vector<Point> > contours;
     std::vector < std::vector<Point> > filteredContours;
@@ -62,7 +62,7 @@ int main( ) {
 
     drawContours( clean, filteredContours, -1, Scalar(0,255,0) );
     sprintf(this_clean_filename, "%d%s", i, clean_filename);
-    imwrite(this_clean_filename, clean);
+    //imwrite(this_clean_filename, clean);
   }
   return(0);
 }

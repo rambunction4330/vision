@@ -115,10 +115,10 @@ int main( int, char** argv )
         recentTargets.push_back(Point2d(-1, -1));
       }
       if ( good_count > 5 ) {
-        line( clean, Point2d(averageX-10, 100), Point2d(averageX+10, 100), Scalar(128,128,128), 1, 8, 0);
-        line( clean, Point2d(averageX-10, 200), Point2d(averageX+10, 200), Scalar(128,128,128), 1, 8, 0);
+//        line( clean, Point2d(averageX-10, 100), Point2d(averageX+10, 100), Scalar(128,128,128), 1, 8, 0);
+ //       line( clean, Point2d(averageX-10, 200), Point2d(averageX+10, 200), Scalar(128,128,128), 1, 8, 0);
         // green line
-        line( clean, Point2d(averageX, 200), Point2d(averageX, 100+10*(10 - good_count)), Scalar(4,106,38), 2, 8, 0);
+  //      line( clean, Point2d(averageX, 200), Point2d(averageX, 100+10*(10 - good_count)), Scalar(4,106,38), 2, 8, 0);
       }
     } else if ( bestShapeMatch < 1000000 ) {
       recentTargets.push_back(bestCenter);
