@@ -11,11 +11,15 @@
 #include "opencv2/opencv.hpp"
 
 #define PORTNUMBER  9001 
-#define DONOTKNOW 1000000
+#define DONOTKNOW 10000000
 
 using namespace std;
 using namespace cv;
 
+int fr = 10;
+int xres = 640;
+int yres = 480;
+int cameraAngle = 70.42;
 double relativeBearing = DONOTKNOW;
 pthread_mutex_t dataLock;
 
@@ -102,10 +106,10 @@ int main(void)
 
 void *capture(void *arg) {  
 
-  VideoCapture capture(1);
-  capture.set(CV_CAP_PROP_FRAME_WIDTH, 640);
-  capture.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
-  capture.set(CV_CAP_PROP_FPS, 10);
+  VideoCapture capture(0);
+  capture.set(CV_CAP_PROP_FRAME_WIDTH, xres);
+  capture.set(CV_CAP_PROP_FRAME_HEIGHT, yres);
+  capture.set(CV_CAP_PROP_FPS, fr);
   if(!capture.isOpened()) {
     cout << "Failed to connect to the camera." << endl;
   }
@@ -129,7 +133,7 @@ void *capture(void *arg) {
     }
 
     cvtColor(frame, hsv, CV_BGR2HSV);
-    inRange(hsv, Scalar(30,22,158), Scalar(105,255,255), binary);
+    inRange(hsv, Scalar(40,22,158), Scalar(105,255,255), binary);
 
     std::vector < std::vector<Point> > contours;
     tmpBinary = binary.clone();
@@ -152,10 +156,10 @@ void *capture(void *arg) {
       double shapematch = matchShapes(shape, contours[contourIdx], CV_CONTOURS_MATCH_I2, 0);
       //A perfect match would be 0.
       //Smaller is a better match.
-      if(shapematch > 5){
+      if(shapematch > 3){
 		  continue;
 	  }
-	  //cout << "match value = " << shapematch << endl;
+	  cout << "match value = " << shapematch << endl;
       if(shapematch < bestShapeMatch){
         bestShapeMatch = shapematch;
         xOfBestShapeMatch = moms.m10 / moms.m00;
@@ -165,9 +169,9 @@ void *capture(void *arg) {
     
     double angle = DONOTKNOW;
     if ( xOfBestShapeMatch != -1) {
-      angle = (xOfBestShapeMatch - 320)*60/640;
-      //cout << "x = "  << xOfBestShapeMatch << endl;
-      //cout << "angle = " << angle << endl; 
+      angle = (xOfBestShapeMatch - (xres/2))*cameraAngle/xres;
+      cout << "x = "  << xOfBestShapeMatch << endl;
+      cout << "angle = " << angle << endl; 
     }
   
     // obtain the lock and copy the data
