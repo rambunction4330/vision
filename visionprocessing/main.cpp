@@ -16,6 +16,7 @@
 using namespace std;
 using namespace cv;
 
+//added for further changes
 int fr = 10;
 int xres = 640;
 int yres = 480;
