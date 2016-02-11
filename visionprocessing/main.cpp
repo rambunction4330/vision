@@ -171,7 +171,7 @@ void *capture(void *arg) {
     
     double angle = DONOTKNOW;
     if ( xOfBestShapeMatch != -1) {
-      angle = (xOfBestShapeMatch - (xres/2))*cameraAngle/xres;
+      angle = (xOfBestShapeMatch - (960/2))*cameraAngle/960;
       cout << "x = "  << xOfBestShapeMatch << endl;
       cout << "angle = " << angle << endl; 
     }
