@@ -7,19 +7,22 @@ int main( ) {
   const char* source_filename = "source.jpg";
   const char* binary_filename = "binary.jpg";
   const char* clean_filename = "clean.jpg";
+  const char* test_filename = "test.jpg";
   char this_source_filename[255];
   char this_binary_filename[255];
   char this_clean_filename[255];
-
-  VideoCapture capture(1);
+  char this_test_filename[255];
+  int xres = 640/1920;
+  int yres = 480/1080;
+  VideoCapture capture(0);
   // want 1920X1080 ?
-  capture.set(CV_CAP_PROP_FRAME_WIDTH, 640);
-  capture.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
+  capture.set(CV_CAP_PROP_FRAME_WIDTH, 1920);
+  capture.set(CV_CAP_PROP_FRAME_HEIGHT, 1080);
   capture.set(CV_CAP_PROP_FPS, 10);
   if(!capture.isOpened()) {
     cout << "Failed to connect to the camera." << endl;
   }
-  Mat frame, framecopy, hsv, binary, tmpBinary, clean;
+  Mat frame, ram, framecopy, hsv, binary, tmpBinary, clean;
 //Change maxFrames for maximum amount of frames saved.
   int maxFrames = 600;
   for(int i=0; i < maxFrames; i++) {
@@ -33,10 +36,14 @@ int main( ) {
     sprintf(this_source_filename, "%d%s", i, source_filename);
     imwrite(this_source_filename, framecopy);
     
+   resize(frame, ram, ram.size(), .35 , .35, INTER_AREA);
+   sprintf(this_test_filename, "%d%s", i, test_filename);
+   imwrite(this_test_filename, ram);
+
     cvtColor(framecopy, hsv, CV_BGR2HSV);
     inRange(hsv, Scalar(30,22,158), Scalar(100,255,255), binary);
-    sprintf(this_binary_filename, "%d%s", i, binary_filename);
-    //imwrite(this_binary_filename, binary);
+  //  sprintf(this_binary_filename, "%d%s", i, binary_filename);
+//    imwrite(this_binary_filename, binary);
 
     std::vector < std::vector<Point> > contours;
     std::vector < std::vector<Point> > filteredContours;
@@ -61,7 +68,7 @@ int main( ) {
     }
 
     drawContours( clean, filteredContours, -1, Scalar(0,255,0) );
-    sprintf(this_clean_filename, "%d%s", i, clean_filename);
+    //sprintf(this_clean_filename, "%d%s", i, clean_filename);
     //imwrite(this_clean_filename, clean);
   }
   return(0);
