@@ -114,7 +114,7 @@ void *capture(void *arg) {
   if(!capture.isOpened()) {
     cout << "Failed to connect to the camera." << endl;
   }
-  Mat frame, ram, hsv, binary, tmpBinary;
+  Mat frame, dst, hsv, binary, tmpBinary;
   //Ideal shape of high goal reflective tape.
   std::vector<Point> shape;
   shape.push_back(Point2d(0,0));
@@ -128,12 +128,12 @@ void *capture(void *arg) {
   shape.push_back(Point2d(0,0));
   while(true) {
 		
-    capture >> ram;
-    if(ram.empty()) {
+    capture >> dst;
+    if(dst.empty()) {
       cout << "failed to capture an image" << endl;
     }
     
-    resize(ram ,frame, frame.size(), .5, .5, INTER_AREA);   
+    resize(dst ,frame, frame.size(), .35, .35, INTER_AREA);   
     cvtColor(frame, hsv, CV_BGR2HSV);
     inRange(hsv, Scalar(40,22,158), Scalar(105,255,255), binary);
 
