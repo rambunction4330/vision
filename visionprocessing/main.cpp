@@ -135,7 +135,7 @@ void *capture(void *arg) {
     
     resize(dst ,frame, frame.size(), .35, .35, INTER_AREA);   
     cvtColor(frame, hsv, CV_BGR2HSV);
-    inRange(hsv, Scalar(40,22,158), Scalar(105,255,255), binary);
+    inRange(hsv, Scalar(40,0,158), Scalar(105,255,255), binary);
 
     std::vector < std::vector<Point> > contours;
     tmpBinary = binary.clone();
