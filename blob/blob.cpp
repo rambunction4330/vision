@@ -9,13 +9,13 @@ using namespace cv;
 using namespace std;
 
 /// Global variables
-Mat src, src_hsv, color_filtered;
-int iLowH = 31;
-int iHighH = 105;
-int iLowS = 22; 
-int iHighS = 255;
-int iLowV = 158;
-int iHighV = 255;
+Mat src, src_hls, color_filtered;
+int iLowH = 50;
+int iHighH = 97;
+int iLowS = 109; 
+int iHighS = 235;
+int iLowL = 85;
+int iHighL = 255;
 
 const char* controls_window = "Controls";
 const char* color_filter_window = "Binary Image";
@@ -29,7 +29,7 @@ int main( int, char** argv )
 {
   /// Load source image and convert it to gray
   src = imread( argv[1], 1 );
-  cvtColor( src, src_hsv, CV_BGR2HSV );
+  cvtColor( src, src_hls, CV_BGR2HLS );
 
   /// Create a window and a trackbar
   namedWindow( controls_window, CV_WINDOW_AUTOSIZE );
@@ -37,8 +37,8 @@ int main( int, char** argv )
   createTrackbar( "HighH: ", controls_window, &iHighH, 179, clean_demo );
   createTrackbar( "LowS: ", controls_window, &iLowS, 255, clean_demo );
   createTrackbar( "HighS: ", controls_window, &iHighS, 255, clean_demo );
-  createTrackbar( "LowV: ", controls_window, &iLowV, 255, clean_demo );
-  createTrackbar( "HighV: ", controls_window, &iHighV, 255, clean_demo );
+  createTrackbar( "LowL: ", controls_window, &iLowL, 255, clean_demo );
+  createTrackbar( "HighL: ", controls_window, &iHighL, 255, clean_demo );
   imshow( controls_window, src );
 
   clean_demo( 0, 0 );
@@ -49,9 +49,9 @@ int main( int, char** argv )
 
 void clean_demo( int, void* )
 {
-  printf( "(%d,%d,%d) to (%d,%d,%d)\n", iLowH, iLowS, iLowV, iHighH, iHighS, iHighV );
+  printf( "(%d,%d,%d) to (%d,%d,%d)\n", iLowH, iLowS, iLowL, iHighH, iHighS, iHighL );
 
-  inRange( src_hsv, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), color_filtered ); 
+  inRange( src_hls, Scalar(iLowH, iLowS, iLowL), Scalar(iHighH, iHighS, iHighL), color_filtered ); 
   namedWindow( color_filter_window, CV_WINDOW_AUTOSIZE );
   imshow( color_filter_window, color_filtered );
 
@@ -96,7 +96,7 @@ void clean_demo( int, void* )
 	
     // filter blobs which are too small
     double area = moms.m00;
-    if ( area < 300 ) {
+    if ( area < 400 ) {
       continue;
     }
     Rect rect = boundingRect(contours[contourIdx]);
