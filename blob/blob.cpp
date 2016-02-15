@@ -13,7 +13,7 @@ Mat src, src_hls, color_filtered;
 int iLowH = 50;
 int iHighH = 97;
 int iLowS = 109; 
-int iHighS = 235;
+int iHighS = 255;
 int iLowL = 85;
 int iHighL = 255;
 
@@ -96,7 +96,7 @@ void clean_demo( int, void* )
 	
     // filter blobs which are too small
     double area = moms.m00;
-    if ( area < 400 ) {
+    if ( area < 300 ) {
       continue;
     }
     Rect rect = boundingRect(contours[contourIdx]);

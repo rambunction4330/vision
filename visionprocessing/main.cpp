@@ -17,6 +17,13 @@ using namespace std;
 using namespace cv;
 
 //added for further changes
+int iLowH = 31;
+int iHighH = 97;
+int iLowS = 100; 
+int iHighS = 255;
+int iLowL = 70;
+int iHighL = 255;
+
 int fr = 10;
 int xres = 1920;
 int yres = 1080;
@@ -129,13 +136,13 @@ void *capture(void *arg) {
   while(true) {
 		
     capture >> dst;
-    if(dst.empty()) {
-      cout << "failed to capture an image" << endl;
-    }
+//    if(dst.empty()) {
+//      cout << "failed to capture an image" << endl;
+//    }
     
     resize(dst ,frame, frame.size(), .35, .35, INTER_AREA);   
-    cvtColor(frame, hsv, CV_BGR2HSV);
-    inRange(hsv, Scalar(40,0,158), Scalar(105,255,255), binary);
+    cvtColor(frame, hsv, CV_BGR2HLS);
+    inRange(hsv, Scalar(iLowH, iLowS, iLowL), Scalar(iHighH, iHighS, iHighL), binary);
 
     std::vector < std::vector<Point> > contours;
     tmpBinary = binary.clone();
@@ -144,7 +151,7 @@ void *capture(void *arg) {
     
     double bestShapeMatch = DONOTKNOW;
     double xOfBestShapeMatch = -1;
-    double minimumArea = 400;    
+    double minimumArea = 200;    
 
     for (size_t contourIdx = 0; contourIdx < contours.size(); contourIdx++) {
 
@@ -158,7 +165,7 @@ void *capture(void *arg) {
       double shapematch = matchShapes(shape, contours[contourIdx], CV_CONTOURS_MATCH_I2, 0);
       //A perfect match would be 0.
       //Smaller is a better match.
-      if(shapematch > 3){
+      if(shapematch > 4){
 		  continue;
 	  }
 	  cout << "match value = " << shapematch << endl;
@@ -171,7 +178,7 @@ void *capture(void *arg) {
     
     double angle = DONOTKNOW;
     if ( xOfBestShapeMatch != -1) {
-      angle = (xOfBestShapeMatch - (960/2))*cameraAngle/960;
+      angle = (xOfBestShapeMatch - (672/2))*cameraAngle/672;
       cout << "x = "  << xOfBestShapeMatch << endl;
       cout << "angle = " << angle << endl; 
     }
