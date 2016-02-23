@@ -26,7 +26,7 @@ int iHighL = 255;
 int fr = 10;
 int xres = 1920;
 int yres = 1080;
-int cameraAngle = 70.42;
+double cameraAngle = 70.42;
 double relativeBearing = DONOTKNOW;
 double globalYAngle = DONOTKNOW;
 pthread_mutex_t dataLock;
