@@ -27,6 +27,7 @@ int fr = 10;
 int xres = 1920;
 int yres = 1080;
 double cameraAngle = 70.42;
+double yCameraAngle = (cameraAngle*9)/16;
 double relativeBearing = DONOTKNOW;
 double globalYAngle = DONOTKNOW;
 pthread_mutex_t dataLock;
@@ -183,7 +184,7 @@ void *capture(void *arg) {
     double yAngle = DONOTKNOW;
     if (foundBestMatch) {
       angle = (pointOfBestShapeMatch.x - (672/2))*cameraAngle/672;
-      yAngle = ((378/2) - pointOfBestShapeMatch.y )*cameraAngle/672;
+      yAngle = ((378/2) - pointOfBestShapeMatch.y )*yCameraAngle/672;
       cout << "x = "  << pointOfBestShapeMatch.x << endl;
       cout << "xangle = " << angle << endl;
       cout << "yAngle = " << yAngle << endl; 
