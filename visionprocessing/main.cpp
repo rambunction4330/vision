@@ -23,12 +23,12 @@ int iLowS = 100;
 int iHighS = 255;
 int iLowL = 70;
 int iHighL = 255;
-
 int fr = 10;
 int xres = 1920;
 int yres = 1080;
 int cameraAngle = 70.42;
 double relativeBearing = DONOTKNOW;
+double globalYAngle = DONOTKNOW;
 pthread_mutex_t dataLock;
 
 // forward declaration of functions
@@ -82,8 +82,9 @@ int main(void)
     perror("listen");
     exit(1);
   }
-  int i = 3;
+ 
   pthread_t captureThreadId;
+  int i = 3;
   int captureThread = pthread_create(&captureThreadId, NULL, capture, (void*)&i);
 
   // it is important to detach the thread to avoid memory leak
@@ -136,9 +137,9 @@ void *capture(void *arg) {
   while(true) {
 		
     capture >> dst;
-//    if(dst.empty()) {
-//      cout << "failed to capture an image" << endl;
-//    }
+    if(dst.empty()) {
+      cout << "failed to capture an image" << endl;
+    }
     
     resize(dst ,frame, frame.size(), .35, .35, INTER_AREA);   
     cvtColor(frame, hsv, CV_BGR2HLS);
@@ -150,8 +151,9 @@ void *capture(void *arg) {
     tmpBinary.release();
     
     double bestShapeMatch = DONOTKNOW;
-    double xOfBestShapeMatch = -1;
-    double minimumArea = 200;    
+    Point2d pointOfBestShapeMatch;
+    double minimumArea = 350;
+    bool foundBestMatch = false;    
 
     for (size_t contourIdx = 0; contourIdx < contours.size(); contourIdx++) {
 
@@ -171,21 +173,26 @@ void *capture(void *arg) {
 	  cout << "match value = " << shapematch << endl;
       if(shapematch < bestShapeMatch){
         bestShapeMatch = shapematch;
-        xOfBestShapeMatch = moms.m10 / moms.m00;
+        pointOfBestShapeMatch = Point2d(moms.m10 / moms.m00, moms.m01 / moms.m00);
+        foundBestMatch = true;
       }
     
     }
     
     double angle = DONOTKNOW;
-    if ( xOfBestShapeMatch != -1) {
-      angle = (xOfBestShapeMatch - (672/2))*cameraAngle/672;
-      cout << "x = "  << xOfBestShapeMatch << endl;
-      cout << "angle = " << angle << endl; 
+    double yAngle = DONOTKNOW;
+    if (foundBestMatch) {
+      angle = (pointOfBestShapeMatch.x - (672/2))*cameraAngle/672;
+      yAngle = ((378/2) - pointOfBestShapeMatch.y )*cameraAngle/672;
+      cout << "x = "  << pointOfBestShapeMatch.x << endl;
+      cout << "xangle = " << angle << endl;
+      cout << "yAngle = " << yAngle << endl; 
     }
   
     // obtain the lock and copy the data
     pthread_mutex_lock(&dataLock);
     relativeBearing = angle;
+    globalYAngle = yAngle;
     pthread_mutex_unlock(&dataLock);
   }
 }
@@ -212,6 +219,7 @@ void *handleClient(void *arg) {
       // obtain the lock and copy the data
       pthread_mutex_lock(&dataLock);
       double copyRelativeBearing = relativeBearing;
+      double copyGlobalYAngle = globalYAngle;
       pthread_mutex_unlock(&dataLock);
       
       // the protocol will send an empty line when the data transfer is complete
@@ -219,7 +227,7 @@ void *handleClient(void *arg) {
       if ( copyRelativeBearing == DONOTKNOW ) {
         sendbufferLen = sprintf(sendbuffer, "\n");
       } else {
-        sendbufferLen = sprintf(sendbuffer, "rb=%.1f\n\n", copyRelativeBearing);
+        sendbufferLen = sprintf(sendbuffer, "rb=%.1f\nya=%.1f\n\n", copyRelativeBearing, copyGlobalYAngle);
       }
 
       // write response to client
