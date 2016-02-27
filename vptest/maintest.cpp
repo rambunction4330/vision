@@ -39,33 +39,7 @@ void *capture(void *arg);
 
 int main(void)
 {
-  VideoCapture capture(0);
-  capture.set(CV_CAP_PROP_FRAME_WIDTH, xres);
-  capture.set(CV_CAP_PROP_FRAME_HEIGHT, yres);
-  capture.set(CV_CAP_PROP_FPS, fr);
-  if(!capture.isOpened()) {
-    cout << "Failed to connect to the camera." << endl;
-  }
-  Mat frame, dst, hsv, binary, tmpBinary;
-  //Ideal shape of high goal reflective tape.
-  std::vector<Point> shape;
-  shape.push_back(Point2d(0,0));
-  shape.push_back(Point2d(0,12));
-  shape.push_back(Point2d(2,12));
-  shape.push_back(Point2d(2,2));
-  shape.push_back(Point2d(18,2));
-  shape.push_back(Point2d(18,12));
-  shape.push_back(Point2d(20,12));
-  shape.push_back(Point2d(20,0));
-  shape.push_back(Point2d(0,0));
-  while(true) {
-    
-    capture >> dst;
-    if(dst.empty()) {
-      cout << "failed to capture an image" << endl;
-    }
-    
-    resize(dst ,frame, frame.size(), .35, .35, INTER_AREA);
+  
   int n, s;
   socklen_t len;
   int max;
@@ -110,7 +84,33 @@ int main(void)
     perror("listen");
     exit(1);
   }
- 
+ VideoCapture capture(0);
+  capture.set(CV_CAP_PROP_FRAME_WIDTH, xres);
+  capture.set(CV_CAP_PROP_FRAME_HEIGHT, yres);
+  capture.set(CV_CAP_PROP_FPS, fr);
+  if(!capture.isOpened()) {
+    cout << "Failed to connect to the camera." << endl;
+  }
+  Mat frame, dst, hsv, binary, tmpBinary;
+  //Ideal shape of high goal reflective tape.
+  std::vector<Point> shape;
+  shape.push_back(Point2d(0,0));
+  shape.push_back(Point2d(0,12));
+  shape.push_back(Point2d(2,12));
+  shape.push_back(Point2d(2,2));
+  shape.push_back(Point2d(18,2));
+  shape.push_back(Point2d(18,12));
+  shape.push_back(Point2d(20,12));
+  shape.push_back(Point2d(20,0));
+  shape.push_back(Point2d(0,0));
+  while(true) {
+    
+    capture >> dst;
+    if(dst.empty()) {
+      cout << "failed to capture an image" << endl;
+    }
+    
+    resize(dst ,frame, frame.size(), .35, .35, INTER_AREA);
   pthread_t captureThreadId;
   int i = 3;
   int captureThread = pthread_create(&captureThreadId, NULL, capture, (void*)&i);
