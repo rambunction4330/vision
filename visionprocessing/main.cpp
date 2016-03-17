@@ -17,11 +17,11 @@ using namespace std;
 using namespace cv;
 
 //added for further changes
-int iLowH = 31;
-int iHighH = 97;
-int iLowS = 100; 
+int iLowH = 99;
+int iHighH = 167;
+int iLowS = 109; 
 int iHighS = 255;
-int iLowL = 70;
+int iLowL = 85;
 int iHighL = 255;
 int fr = 10;
 int xres = 1920;

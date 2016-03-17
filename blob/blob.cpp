@@ -10,8 +10,8 @@ using namespace std;
 
 /// Global variables
 Mat src, src_hls, color_filtered;
-int iLowH = 50;
-int iHighH = 97;
+int iLowH = 99;
+int iHighH = 176;
 int iLowS = 109; 
 int iHighS = 255;
 int iLowL = 85;
